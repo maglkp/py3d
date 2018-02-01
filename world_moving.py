@@ -1,5 +1,10 @@
 import pygame, sys, math
 
+def rotate2d(pos, rad): 
+	x, y = pos
+	s, c = math.sin(rad), math.cos(rad)
+	return x*c - y*s, y*c + x*s
+
 class Cam:
 	def __init__(self, pos=(0,0,0), rot=(0,0)):
 		self.pos = list(pos)
@@ -11,7 +16,7 @@ class Cam:
 		if key[pygame.K_q]: self.pos[1] -= s
 		if key[pygame.K_e]: self.pos[1] += s
 		
-		if key[pygame.K_w]: self.pos[2] += s; print("!!!!")
+		if key[pygame.K_w]: self.pos[2] += s
 		if key[pygame.K_s]: self.pos[2] -= s
 		if key[pygame.K_a]: self.pos[0] -= s
 		if key[pygame.K_d]: self.pos[0] += s
@@ -24,20 +29,20 @@ clock = pygame.time.Clock()
 
 
 verts = (-1,-1,-1), (1,-1,-1), (1,1,-1), (-1,1,-1), (-1,-1,1), (1,-1,1), (1,1,1), (-1,1,1)
-#verts = (0,1,5), (1,0,5)
 edges = (0, 1), (1,2), (2,3), (3,0), (4, 5), (5,6), (6,7), (7,4), (0, 4), (1,5), (2,6), (3,7)
 cam = Cam((0,0,-5))
-
+radian = 0
 
 while True:
 	pygame.event.pump()
 	dt = clock.tick()/1000
+	radian += dt
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			sys.exit()
-	screen.fill((225, 225, 225))
+	screen.fill((205, 205, 205))
 
 
 	#pygame.draw.circle(screen, (0, 0, 0), (200, 200), 6)
@@ -48,6 +53,10 @@ while True:
 				x -= cam.pos[0]
 				y -= cam.pos[1]
 				z -= cam.pos[2]
+
+				x, z = rotate2d((x,z), radian)
+
+
 				f = 200/z
 				x, y = x*f, y*f
 				points += [[cx + int(x), cy + int(y)]]
