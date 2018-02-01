@@ -10,6 +10,14 @@ class Cam:
 		self.pos = list(pos)
 		self.rot = list(rot)
 
+	def events(self, event):		
+		if event.type == pygame.MOUSEMOTION:
+			x,y = event.rel
+			x/=200
+			y/=200
+			self.rot[0] += y
+			self.rot[1] += x	
+
 	def update(self, dt, key):
 		#print(".")
 		s = dt*10
@@ -20,6 +28,7 @@ class Cam:
 		if key[pygame.K_s]: self.pos[2] -= s
 		if key[pygame.K_a]: self.pos[0] -= s
 		if key[pygame.K_d]: self.pos[0] += s
+	
 
 pygame.init()
 w, h = 400, 400
@@ -27,25 +36,27 @@ cx, cy = w//2, h//2
 screen = pygame.display.set_mode((w,h))
 clock = pygame.time.Clock()
 
-
 verts = (-1,-1,-1), (1,-1,-1), (1,1,-1), (-1,1,-1), (-1,-1,1), (1,-1,1), (1,1,1), (-1,1,1)
 edges = (0, 1), (1,2), (2,3), (3,0), (4, 5), (5,6), (6,7), (7,4), (0, 4), (1,5), (2,6), (3,7)
 cam = Cam((0,0,-5))
-radian = 0
+
+pygame.event.get()
+pygame.mouse.get_rel()
+pygame.mouse.set_visible(0)
+pygame.event.set_grab(1)
 
 while True:
-	pygame.event.pump()
+	#pygame.event.pump()
 	dt = clock.tick()/1000
-	radian += dt
-
+	
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			sys.exit()
+		#cam.events(event)
+
 	screen.fill((205, 205, 205))
 
-
-	#pygame.draw.circle(screen, (0, 0, 0), (200, 200), 6)
 
 	for edge in edges:
 		points = []
@@ -54,7 +65,8 @@ while True:
 				y -= cam.pos[1]
 				z -= cam.pos[2]
 
-				x, z = rotate2d((x,z), radian)
+				x, z = rotate2d((x,z), cam.rot[1])
+				y, z = rotate2d((y,z), cam.rot[0])
 
 
 				f = 200/z
